@@ -1,0 +1,78 @@
+{
+  "id": "nl.philips.zigbee",
+  "name": {
+    "en": "Philips Zigbee"
+  },
+  "description": {
+    "en": "Philips Zigbee",
+    "nl": "Philips Zigbee"
+  },
+  "category": [
+    "lights"
+  ],
+  "version": "1.0.0",
+  "compatibility": ">=1.5.0",
+  "sdk": 2,
+  "author": {
+    "name": "Kasteleman",
+    "email": "kasteleman@gmail.com"
+  },
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "drivers": [
+    {
+      "id": "motion",
+      "name": {
+        "en": "Motion Sensor",
+        "nl": "Motion Sensor"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "alarm_motion",
+        "measure_luminance",
+        "measure_temperature",
+        "measure_battery",
+        "alarm_battery"
+      ],
+      "images": {
+        "large": "drivers/motion/assets/images/large.png",
+        "small": "drivers/motion/assets/images/small.png"
+      },
+      "zigbee": {
+        "manufacturerName": "Philips",
+        "productId": "SML001",
+        "deviceId": 2128,
+        "profileId": 49246,
+        "learnmode": {
+          "instruction": {
+            "en": "Toggle the Plug to start pairing.\n\nIf pairing does not automatically start, try turning the Plug on and off 6 times.",
+            "nl": "Zet de Plug uit en weer aan.\n\nWordt de Plug niet automatisch toegevoegd, probeer hem dan 6 keer aan en uit te zetten."
+          }
+        }
+      },
+      "settings": [
+        {
+          "id": "bat_thres",
+          "type": "number",
+          "label": {
+            "en": "Battery Low Alarm Voltage Threshold multiplied by 10",
+            "nl": "Batterij laag Voltage Drempel vermenigvuldigd met factor 10"
+          },
+          "hint": {
+            "en": "This setting determines the threshold before a battery alarm is given (29 is 2.9V).",
+            "nl": "Deze instelling bepaalt de drempelwaarde opdat een batterij alarm wordt gegeven (29 is 2.9V)."
+          },
+          "value": 29,
+          "attr": {
+            "min": 0,
+            "max": 6553
+          }
+        }
+      ]
+    }
+  ],
+  "flow": {
+  }
+}
