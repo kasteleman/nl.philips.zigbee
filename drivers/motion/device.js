@@ -8,77 +8,44 @@ class Motionsensor extends ZigBeeLightDevice {
 		this.printNode();
 
 		this.batteryThreshold = 29;
+		this.motionThreshold = this.getSetting('motionThreshold') || 1;
+		this.minReportInterval = this.getSetting('minReportInterval') || 1;
+		this.maxReportInterval = this.getSetting('maxReportInterval') || 300;
 
-		/* this.node.endpoints[1].clusters['msOccupancySensing'].do({ pirOToUDelay: 30 })
-		.then(result => {
-			console.log('setting pirOToUDelay succeded');
-		})
-    .catch(err => {
-			console.log('error setting pirOToUDelay');
-		});*/
-
-		/* this.node.endpoints[1].clusters['msOccupancySensing'].read('pirOToUDelay')
-    .then(result => {
-			console.log(result);
-    })
-    .catch(err => {
-			console.log('could not read modelId');
-    });*/
+		console.log(this.motionThreshold);
+		console.log(this.minReportInterval);
+		console.log(this.maxReportInterval);
 
 		// alarm_motion
-		this.registerReportListener('msOccupancySensing', 'occupancy', report => {
-			console.log(report);
+		this.registerAttrReportListener('msOccupancySensing', 'occupancy', this.minReportInterval, this.maxReportInterval, this.motionThreshold, data => {
+    	this.log('occupancy', data);
 		}, 1);
 
-		this.registerCapability('alarm_motion', 'msOccupancySensing', {
-			getOpts: {
-				pollInterval: 5000,
-			},
-		});
+		// Add to queue
+		// this._configureReportRequests.push({ reportId, endpointId, clusterId, attrId, minInt, maxInt, repChange });
+
+		// If not already binding start the binding process
+		// if (!this.configureReportInProcess) this._configureReport();
 
 		// alarm_battery
-		this.registerReportListener('genPowerCfg', 'batteryVoltage', report => {
-			console.log(report);
+		this.registerAttrReportListener('genPowerCfg', 'batteryVoltage', 3600, 43200, 1, data => {
+    	this.log('batteryVoltage', data);
 		}, 1);
-
-		this.registerCapability('alarm_battery', 'genPowerCfg', {
-			getOpts: {
-				pollInterval: 43200000,
-			},
-		});
 
 		// measure_temperature
-		this.registerReportListener('msTemperatureMeasurement', 'measuredValue', report => {
-			console.log(report);
+		this.registerAttrReportListener('msTemperatureMeasurement', 'measuredValue', 1800, 3660, 10, data => {
+    	this.log('measuredValue', data);
 		}, 1);
-
-		this.registerCapability('measure_temperature', 'msTemperatureMeasurement', {
-			getOpts: {
-				pollInterval: 3600000,
-			},
-		});
 
 		// measure_luminance
-		this.registerReportListener('msIlluminanceMeasurement', 'measuredValue', report => {
-			console.log(report);
+		this.registerAttrReportListener('msIlluminanceMeasurement', 'measuredValue', 300, 900, 1, data => {
+    	this.log('measuredValue', data);
 		}, 1);
-
-		this.registerCapability('measure_luminance', 'msIlluminanceMeasurement', {
-			getOpts: {
-				pollInterval: 300000,
-			},
-		});
 
 		// measure_battery
-		this.registerReportListener('genPowerCfg', 'batteryPercentageRemaining', report => {
-			console.log(report);
+		this.registerAttrReportListener('genPowerCfg', 'batteryPercentageRemaining', 3600, 43200, 1, data => {
+    	this.log('measuredValue', data);
 		}, 1);
-
-		this.registerCapability('measure_battery', 'genPowerCfg', {
-			getOpts: {
-				pollInterval: 43200000,
-			},
-		});
 
 		if (this.node) {
 			this.node.on('command', report => {
@@ -88,6 +55,41 @@ class Motionsensor extends ZigBeeLightDevice {
 		}
 
 	}
+
+	onSettings( newSettingsObj, oldSettingsObj, changedKeysArr, callback ) {
+	    // run when the user has changed the device's settings in Homey.
+	    // changedKeysArr contains an array of keys that have been changed
+
+	    // always fire the callback, or the settings won't change!
+	    // if the settings must not be saved for whatever reason:
+	    // callback( "Your error message", null );
+	    // else
+			callback( null, true );
+			this.batteryThreshold = this.getSetting('batteryThreshold');
+			this.motionThreshold = this.getSetting('motionThreshold');
+			this.minReportInterval = this.getSetting('minReportInterval');
+			this.maxReportInterval = this.getSetting('maxReportInterval');
+
+			this.reconfigureAttrReport = this.getSetting('reconfigureAttrReport');
+
+			console.log(this.batteryThreshold);
+			console.log(this.motionThreshold);
+			console.log(this.minReportInterval);
+			console.log(this.maxReportInterval);
+			console.log(this.reconfigureAttrReport);
+
+
+			if (this.reconfigureAttrReport) {
+				this.registerAttrReportListener('msOccupancySensing', 'occupancy', this.minReportInterval, this.maxReportInterval, this.motionThreshold, data => {
+					this.log('occupancy', data);
+				}, 1);
+				this.setSettings({'reconfigureAttrReport': false,})
+    		.then( this.log )
+    		.catch( this.error )
+			}
+
+	}
+
 }
 
 module.exports = Motionsensor;
