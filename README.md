@@ -1,1 +1,1 @@
-# Philips Zigbee
+# Philips Zigbee Motion Sensor

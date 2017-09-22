@@ -72,25 +72,7 @@
           }
         },
         {
-          "id": "motionThreshold",
-          "type": "number",
-          "label": {
-            "en": "Treshold to send report",
-            "nl": "Drempelwaarde voor versturen van report"
-          },
-          "hint": {
-            "en": "Treshold before sending a report to Homey",
-            "nl": "Drempelwaarde voordat een report naar Homey wordt gestuurd"
-          },
-          "value": 1,
-          "attr": {
-            "step": 1,
-            "min": 0,
-            "max": 3
-          }
-        },
-        {
-          "id": "minReportInterval",
+          "id": "minReportMotion",
           "type": "number",
           "label": {
             "en": "Min report interval for motion",
@@ -100,15 +82,15 @@
             "en": "Min interval before a report is send to Homey",
             "nl": "Min tijd voordat een report naar Homey wordt gestuurd"
           },
-          "value": 0,
+          "value": 1,
           "attr": {
             "step": 1,
-            "min": 0,
+            "min": 1,
             "max": 86400
           }
         },
         {
-          "id": "maxReportInterval",
+          "id": "maxReportMotion",
           "type": "number",
           "label": {
             "en": "Max report interval for motion",
@@ -121,19 +103,83 @@
           "value": 300,
           "attr": {
             "step": 1,
-            "min": 0,
+            "min": 60,
             "max": 86400
           }
         },
         {
-          "id": "reconfigureAttrReport",
-          "type": "checkbox",
+          "id": "minReportLux",
+          "type": "number",
           "label": {
-            "en": "reconfigure report",
-            "nl": "reconfigure report"
+            "en": "Min report interval for lux",
+            "nl": "Min report interval voor lux"
           },
-          "value": true
+          "hint": {
+            "en": "Min interval before a report is send to Homey",
+            "nl": "Min tijd voordat een report naar Homey wordt gestuurd"
+          },
+          "value": 300,
+          "attr": {
+            "step": 1,
+            "min": 1,
+            "max": 86400
+          }
+        },
+        {
+          "id": "maxReportLux",
+          "type": "number",
+          "label": {
+            "en": "Max report interval for lux",
+            "nl": "Max report interval voor lux"
+          },
+          "hint": {
+            "en": "Max interval before a report is send to Homey",
+            "nl": "Max tijd voordat een report naar Homey wordt gestuurd"
+          },
+          "value": 900,
+          "attr": {
+            "step": 1,
+            "min": 60,
+            "max": 86400
+          }
+        },
+        {
+          "id": "minReportTemp",
+          "type": "number",
+          "label": {
+            "en": "Min report interval for temperature",
+            "nl": "Min report interval voor temperatuur"
+          },
+          "hint": {
+            "en": "Min interval before a report is send to Homey",
+            "nl": "Min tijd voordat een report naar Homey wordt gestuurd"
+          },
+          "value": 1800,
+          "attr": {
+            "step": 1,
+            "min": 1,
+            "max": 86400
+          }
+        },
+        {
+          "id": "maxReportTemp",
+          "type": "number",
+          "label": {
+            "en": "Max report interval for temperature",
+            "nl": "Max report interval voor temperatuur"
+          },
+          "hint": {
+            "en": "Max interval before a report is send to Homey",
+            "nl": "Max tijd voordat een report naar Homey wordt gestuurd"
+          },
+          "value": 3600,
+          "attr": {
+            "step": 1,
+            "min": 3600,
+            "max": 86400
+          }
         }
+
       ]
     }
   ],
