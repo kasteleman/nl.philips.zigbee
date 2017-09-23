@@ -1,5 +1,7 @@
 'use strict';
 
+const Homey = require('homey');
+
 const ZigBeeDevice = require('homey-meshdriver').ZigBeeDevice;
 
 class Motionsensor extends ZigBeeDevice {
@@ -16,11 +18,11 @@ class Motionsensor extends ZigBeeDevice {
 		}, 1);
 
 		// alarm_battery
-		this.registerAttrReportListener('genPowerCfg', 'batteryVoltage', 1, 3600, 1, data1 => {
+		const batteryThreshold = this.getSetting('batteryThreshold') * 10 || 1;
+		this.registerAttrReportListener('genPowerCfg', 'batteryVoltage', 1, 300, 1, data1 => {
 			this.log('batteryVoltage', data1);
-			const batteryThreshold = this.getSetting('batteryThreshold') || this.batteryThreshold || 1;
 			console.log(batteryThreshold);
-			if (data1 <= batteryThreshold) {
+			if (data1 <= batteryThreshold * 10) {
 				this.setCapabilityValue('alarm_battery', true);
 			} else {
 				this.setCapabilityValue('alarm_battery', false);
@@ -32,7 +34,7 @@ class Motionsensor extends ZigBeeDevice {
 		this.maxReportTemp= this.getSetting('maxReportTemp') || 3600;
 
 		this.registerAttrReportListener('msTemperatureMeasurement', 'measuredValue', this.minReportTemp, this.maxReportTemp, 10, data2 => {
-			this.log('measuredValue', data2);
+			this.log('measuredValue temperature', data2);
 			const temperature = Math.round((data2 / 100) * 10) / 10;
 			this.setCapabilityValue('measure_temperature', temperature);
 		}, 1);
@@ -42,14 +44,14 @@ class Motionsensor extends ZigBeeDevice {
 		this.maxReportLux= this.getSetting('maxReportLux') || 900;
 
 		this.registerAttrReportListener('msIlluminanceMeasurement', 'measuredValue', this.minReportLux, this.maxReportLux, 10, data3 => {
-			this.log('measuredValue', data3);
+			this.log('measuredValue luminance', data3);
 			const luminance = Math.round(Math.pow(10, (data3 - 1) / 10000));
 			this.setCapabilityValue('measure_luminance', luminance);
 		}, 1);
 
 		// measure_battery
-		this.registerAttrReportListener('genPowerCfg', 'batteryPercentageRemaining', 3600, 43200, 1, data4 => {
-			this.log('measuredValue', data4);
+		this.registerAttrReportListener('genPowerCfg', 'batteryPercentageRemaining', 1, 43200, 1, data4 => {
+			this.log('measuredValue battery', data4);
 			if (data4 <= 200 && data4 !== 255) {
 				const percentageRemaining = Math.round(data4 / 2);
 				this.setCapabilityValue('measure_battery', percentageRemaining);
@@ -65,53 +67,59 @@ class Motionsensor extends ZigBeeDevice {
 
 	}
 
-	onSettings( newSettingsObj, oldSettingsObj, changedKeysArr, callback ) {
+	onSettings( oldSettingsObj, newSettingsObj, changedKeysArr, callback ) {
 
+		this.log(changedKeysArr);
+		this.log('newSettingsObj', newSettingsObj);
+		this.log('oldSettingsObj', oldSettingsObj);
+
+if ((newSettingsObj.minReportMotion < newSettingsObj.maxReportMotion) &&
+		(newSettingsObj.minReportTemp < newSettingsObj.maxReportTemp) &&
+		(newSettingsObj.minReportLux < newSettingsObj.maxReportLux)) {
+			this.log('minReport settings smaller then maxReport settings');
 			callback( null, true );
-			this.log(changedKeysArr);
-			this.batteryThreshold = this.getSetting('batteryThreshold');
-			this.minReportMotion = this.getSetting('minReportMotion');
-			this.maxReportMotion = this.getSetting('maxReportMotion');
-			this.minReportLux = this.getSetting('minReportLux');
-			this.maxReportLux = this.getSetting('maxReportLux');
-			this.minReportTemp = this.getSetting('minReportTemp');
-			this.maxReportTemp= this.getSetting('maxReportTemp');
-
-			this.log(`Battery Treshold: '${this.batteryThreshold}'`);
-			this.log(`Min report interval motion: '${this.minReportMotion}'`);
-			this.log(`Max report interval motion: '${this.maxReportMotion}'`);
-			this.log(`Min report interval lux: '${this.minReportLux}'`);
-			this.log(`Max report interval lux: '${this.maxReportLux}'`);
-			this.log(`Min report interval temperature: '${this.minReportTemp}'`);
-			this.log(`Max report interval temperature: '${this.maxReportTemp}'`);
 
 			// alarm_motion report settings changed
 			if ((changedKeysArr.includes('minReportMotion')) || (changedKeysArr.includes('maxReportMotion'))) {
-					this.registerAttrReportListener('msOccupancySensing', 'occupancy', this.minReportMotion, this.maxReportMotion, 1, data => {
-						this.log('occupancy', data);
-						this.setCapabilityValue('alarm_motion', data === 1);
-					}, 1);
+					this.log('minReportMotion: ', newSettingsObj.minReportMotion);
+					this.log('maxReportMotion: ', newSettingsObj.maxReportMotion);
+					if (newSettingsObj.minReportMotion < newSettingsObj.maxReportMotion) {
+						this.registerAttrReportListener('msOccupancySensing', 'occupancy', newSettingsObj.minReportMotion, newSettingsObj.maxReportMotion, 1, data => {
+							this.log('occupancy', data);
+							this.setCapabilityValue('alarm_motion', data === 1);
+						}, 1);
+					}
 			}
+
 			// measure_temperature report settings changed
 			if ((changedKeysArr.includes('minReportTemp')) || (changedKeysArr.includes('maxReportTemp'))) {
-				this.registerAttrReportListener('msTemperatureMeasurement', 'measuredValue', this.minReportTemp, this.maxReportTemp, 10, data2 => {
-					this.log('measuredValue', data2);
-					const temperature = Math.round((data2 / 100) * 10) / 10;
-					this.setCapabilityValue('measure_temperature', temperature);
-				}, 1);
+				this.log('minReportTemp: ', newSettingsObj.minReportTemp);
+				this.log('maxReportTemp: ', newSettingsObj.maxReportTemp);
+				if (newSettingsObj.minReportTemp < newSettingsObj.maxReportTemp) {
+					this.registerAttrReportListener('msTemperatureMeasurement', 'measuredValue', newSettingsObj.minReportTemp, newSettingsObj.maxReportTemp, 10, data2 => {
+						this.log('measuredValue', data2);
+						const temperature = Math.round((data2 / 100) * 10) / 10;
+						this.setCapabilityValue('measure_temperature', temperature);
+					}, 1);
+				}
 			}
 
 			// measure_luminance report settings changed
 			if ((changedKeysArr.includes('minReportLux')) || (changedKeysArr.includes('manReportLux'))) {
-					this.registerAttrReportListener('msIlluminanceMeasurement', 'measuredValue', this.minReportLux, this.maxReportLux, 10, data3 => {
+				this.log('minReportLux: ', newSettingsObj.minReportLux);
+				this.log('maxReportLux: ', newSettingsObj.maxReportLux);
+				if (newSettingsObj.minReportLux < newSettingsObj.maxReportLux) {
+					this.registerAttrReportListener('msIlluminanceMeasurement', 'measuredValue', newSettingsObj.minReportLux, newSettingsObj.maxReportLux, 10, data3 => {
 						this.log('measuredValue', data3);
 						const luminance = Math.round(Math.pow(10, (data3 - 1) / 10000));
 						this.setCapabilityValue('measure_luminance', luminance);
 					}, 1);
+				}
 			}
-
+		}	else {
+			callback( Homey.__("report interval settings error"), null );
+		}
 	}
-
 }
 
 module.exports = Motionsensor;
