@@ -18,11 +18,11 @@ class Motionsensor extends ZigBeeDevice {
 		}, 1);
 
 		// alarm_battery
-		const batteryThreshold = this.getSetting('batteryThreshold') * 10 || 1;
-		this.registerAttrReportListener('genPowerCfg', 'batteryVoltage', 1, 300, 1, data1 => {
+		this.batteryThreshold = this.getSetting('batteryThreshold') * 10;
+		this.registerAttrReportListener('genPowerCfg', 'batteryVoltage', 1, 3600, null, data1 => {
 			this.log('batteryVoltage', data1);
-			console.log(batteryThreshold);
-			if (data1 <= batteryThreshold * 10) {
+			this.log(this.batteryThreshold);
+			if (data1 <= this.batteryThreshold * 10) {
 				this.setCapabilityValue('alarm_battery', true);
 			} else {
 				this.setCapabilityValue('alarm_battery', false);

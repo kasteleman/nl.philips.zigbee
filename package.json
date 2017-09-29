@@ -1,11 +1,10 @@
 {
-  "name": "com.innr",
+  "name": "nl.philips.zigbee",
   "version": "1.0.0",
-  "description": "This app allows you to connect your INNR Devices to Homey",
+  "description": "This app allows you to connect your HUE Motion Sensor directly to Homey without hub",
   "main": "app.js",
   "dependencies": {
     "homey-log": "git+https://github.com/athombv/node-homey-log.git",
-    "homey-meshdriver": "git+https://github.com/athombv/node-homey-meshdriver.git"
   },
   "devDependencies": {},
   "scripts": {
@@ -14,12 +13,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kasteleman/com.innr"
+    "url": "git+https://github.com/kasteleman/nl.philips.zigbee"
   },
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/kasteleman/innr/issues"
-  },
-  "homepage": "https://github.com/kasteleman/innr#readme"
+  "license": "ISC"
 }
