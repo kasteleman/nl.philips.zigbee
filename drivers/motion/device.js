@@ -8,6 +8,12 @@ class Motionsensor extends ZigBeeDevice {
 	onMeshInit() {
 		this.printNode();
 
+		if (this.hasCapability('alarm_motion')) this.registerCapability('alarm_motion', 'msOccupancySensing');
+		if (this.hasCapability('alarm_battery')) this.registerCapability('alarm_battery', 'genPowerCfg');
+		if (this.hasCapability('measure_temperature')) this.registerCapability('measure_temperature', 'msTemperatureMeasurement');
+		if (this.hasCapability('measure_luminance')) this.registerCapability('measure_luminance', 'msIlluminanceMeasurement');
+		if (this.hasCapability('measure_battery')) this.registerCapability('measure_battery', 'genPowerCfg');
+
 		// alarm_motion
 		this.minReportMotion = this.getSetting('minReportMotion') || 1;
 		this.maxReportMotion = this.getSetting('maxReportMotion') || 300;
@@ -19,6 +25,7 @@ class Motionsensor extends ZigBeeDevice {
 
 		// alarm_battery
 		this.batteryThreshold = this.getSetting('batteryThreshold') * 10;
+
 		this.registerAttrReportListener('genPowerCfg', 'batteryVoltage', 1, 3600, null, data1 => {
 			this.log('batteryVoltage', data1);
 			this.log(this.batteryThreshold);
@@ -57,13 +64,6 @@ class Motionsensor extends ZigBeeDevice {
 				this.setCapabilityValue('measure_battery', percentageRemaining);
 			}
 		}, 1);
-
-		if (this.node) {
-			this.node.on('command', report => {
-				console.log('Command received');
-				console.log(report);
-			});
-		}
 
 	}
 

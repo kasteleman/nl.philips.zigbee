@@ -4,7 +4,7 @@
   "description": "This app allows you to connect your HUE Motion Sensor directly to Homey without hub",
   "main": "app.js",
   "dependencies": {
-    "homey-log": "git+https://github.com/athombv/node-homey-log.git",
+    "homey-log": "git+https://github.com/athombv/node-homey-log.git"
   },
   "devDependencies": {},
   "scripts": {
